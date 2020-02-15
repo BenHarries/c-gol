@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "curses.h": "c",
-        "streambuf": "c"
+        "streambuf": "c",
+        "cctype": "c"
     }
 }

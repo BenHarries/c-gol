@@ -1,81 +1,138 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
+
+#include "gol.h"
 
 #define MAXCHAR 1000
 
-struct universe
-{
-    /*Put some appropriate things here*/
-    int width;
-    int height;
-    int *arr;
-};
+// struct universe
+// {
+//     /*Put some appropriate things here*/
+//     int width;
+//     int height;
+//     int *arr;
+//     int evolutions;
+// };
 
 void read_in_file(FILE *infile, struct universe *u)
 {
-    char str[MAXCHAR];
+    u->evolutions = 1;
     int width;
     int height;
-    int i;
-    int j;
 
-    if (infile == NULL)
-    {
-        printf("Could not open file");
-    }
-    height = 0;
+    int *str;
+    int ch;
+    int len = 0;
+    int size;
 
-    while (fgets(str, MAXCHAR, infile) != NULL)
+    size = 10;
+    height = 1;
+    width = -1;
+
+    str = realloc(NULL, sizeof(int) * size); //size is start size
+
+    while (EOF != (ch = fgetc(infile)))
     {
-        width = strlen(str);
-        height++;
+        width++;
+
+        if (ch == '\n')
+        {
+            u->width = width;
+            width = -1;
+            height++;
+        }
+
+        if (ch == '.')
+        {
+            str[len++] = 0;
+        }
+        if (ch == '*')
+        {
+            u->totalAlive++;
+            str[len++] = 1;
+        }
+
+        if (len == size)
+        {
+            str = realloc(str, sizeof(int) * (size += 16));
+        }
     }
 
     u->height = height;
-    u->width = width;
 
-    int r = width, c = height;
-    u->arr = (int *)malloc(r * c * sizeof(int));
+    u->arr = realloc(str, sizeof(int) * len);
 
-    int booli;
+    // u->evolutions = 0;
+    // char str[MAXCHAR];
+    // int width;
+    // int height;
+    // int i;
+    // int j;
 
-    rewind(infile);
-    j = 0;
-    while (fgets(str, MAXCHAR, infile) != NULL)
-    {
-        for (i = 0; str[i] != 0; i++)
-        {
-            if (i == 0)
-            {
-                // printf("\n");
-            }
-            if (str[i] == '.')
-            {
-                // printf("%c", str[i]);
-                booli = 0;
-            }
-            else
-            {
-                // printf("%c", str[i]);
+    // if (infile == NULL)
+    // {
+    //     printf("Could not open file");
+    // }
+    // height = 0;
 
-                booli = 1;
-            }
-            // printf("\n%d %d", j, i);
-            *(u->arr + i + j * r) = booli;
-        }
-        j++;
-    }
-    // printf("\n");
+    // while (fgets(str, MAXCHAR, infile) != NULL)
+    // {
+    //     printf("Could not open file %s", str);
 
-    // printf("width: %d height: %d", u->width, u->height);
+    //     width = strlen(str);
+    //     height++;
+    // }
 
-    fclose(infile);
+    // u->height = height;
+    // u->width = width;
+
+    // int r = width, c = height;
+    // u->arr = (int *)malloc(r * c * sizeof(int));
+
+    // int booli;
+
+    // printf("Could not op file");
+
+    // rewind(infile);
+    // printf("Could not op file");
+
+    // j = 0;
+    // while (fgets(str, MAXCHAR, infile) != NULL)
+    // {
+    //     printf("yo %s", str);
+
+    //     for (i = 0; str[i] != 0; i++)
+    //     {
+    //         if (i == 0)
+    //         {
+    //         }
+    //         if (str[i] == '.')
+    //         {
+    //             booli = 0;
+    //         }
+    //         else
+    //         {
+    //             u->totalAlive++;
+
+    //             booli = 1;
+    //         }
+    //         // printf("\n%d %d", j, i);
+    //         *(u->arr + i + j * r) = booli;
+    //     }
+    //     j++;
+    // }
+    // // printf("\n");
+
+    // // printf("width: %d height: %d", u->width, u->height);
+
+    // fclose(infile);
 }
 
 void write_out_file(FILE *outfile, struct universe *u)
 {
-    int r, i, j, c;
+    int i, j;
 
     for (i = 0; i < u->height; i++)
         for (j = 0; j < u->width; j++)
@@ -84,20 +141,18 @@ void write_out_file(FILE *outfile, struct universe *u)
 
             if (i > 0 && j == 0)
             {
-                printf("\n");
+                fprintf(outfile, "\n");
             }
 
             if (*(u->arr + j + i * u->width) == 1)
             {
-                printf("*");
+                fprintf(outfile, "*");
             }
             else
             {
-                printf(".");
+                fprintf(outfile, ".");
             }
         }
-
-    fclose(outfile);
 }
 
 int is_alive(struct universe *u, int column, int row)
@@ -143,6 +198,7 @@ int will_be_alive(struct universe *u, int column, int row)
 
     if (is_alive(u, column, row))
     {
+        u->totalAlive++;
         if (counter == 2 || counter == 3)
         {
             return 1;
@@ -189,43 +245,45 @@ int will_be_alive_torus(struct universe *u, int column, int row)
 
                 if (((column + i) < 0))
                 {
-                    changei = u->height;
-                    printf("overtheedge");
+                    changei = u->width;
+                    // printf("overtheedge");
                 }
                 if (((column + i) > nColumns - 1))
                 {
-                    changei = -(u->height);
-                    printf("overtheedge");
+                    changei = -(u->width);
+                    // printf("overtheedge");
                 }
                 if ((row + j) < 0)
                 {
-                    changej = u->width;
-                    printf("overtheedge");
+                    changej = u->height;
+                    // printf("overtheedge");
                 }
                 if ((row + j) > nRows - 1)
                 {
-                    changej = -(u->width);
-                    printf("overtheedge");
+                    changej = -(u->height);
+                    // printf("overtheedge");
                 }
 
                 if (((column + i) < 0) || ((column + i) > nColumns - 1) || (row + j) < 0 || (row + j) > nRows - 1)
                 {
-                    printf(" -> Going to %d %d", column + i + changei, row + j + changej);
+                    // printf(" -> Going to %d %d", column + i + changei, row + j + changej);
                 }
 
-                printf("TRUE");
+                // printf("TRUE");
                 if (is_alive(u, column + i + changei, row + j + changej))
                 {
                     counter++;
-                    printf(" ALIVE");
+                    // printf(" ALIVE");
                 }
             }
         }
     }
-    printf("\nAlive Neigbours: %d", counter);
+    // printf("\nAlive Neigbours: %d", counter);
 
     if (is_alive(u, column, row))
     {
+        u->totalAlive++;
+
         if (counter == 2 || counter == 3)
         {
             return 1;
@@ -250,6 +308,7 @@ int will_be_alive_torus(struct universe *u, int column, int row)
 }
 void evolve(struct universe *u, int (*rule)(struct universe *u, int column, int row))
 {
+    u->evolutions++;
     int *temp = (int *)malloc(u->height * u->width * sizeof(int));
 
     int i, j, result;
@@ -282,34 +341,30 @@ void evolve(struct universe *u, int (*rule)(struct universe *u, int column, int 
 }
 void print_statistics(struct universe *u)
 {
+    // printf("Hello");
+    int i, j;
+    float currentStat, currentAlive, historicalStat;
+    currentAlive = 0;
+    for (i = 0; i < u->height; i++)
+    {
+        for (j = 0; j < u->width; j++)
+        {
+            if (*(u->arr + j + i * u->width) == 1)
+            {
+                currentAlive++;
+            }
+            // printf("U %d", *(u->arr + i * u->height + j));
+        }
+    }
+
+    currentStat = (currentAlive * 100) / (u->height * u->width);
+    float nearest = roundf(currentStat * 1000) / 1000;
+
+    printf("\n%.3f%% of cells currently alive", nearest);
+
+    historicalStat = (u->totalAlive * 100) / (u->height * u->width * u->evolutions);
+
+    float nearestH = roundf(historicalStat * 1000) / 1000;
+
+    printf("\n%.3f%% of cells alive on average\n", nearestH);
 }
-
-// int main()
-// {
-//     char *filename = "./glider.txt";
-//     FILE *fp;
-
-//     struct universe v;
-
-//     fp = fopen(filename, "r");
-//     read_in_file(fp, &v);
-
-//     int r, i, j, c, result;
-//     r = v.height;
-//     c = v.width;
-//     printf("\n\n\n\n%d \n%d\n\n\n\n", r, c);
-
-//     for (i = 0; i < r; i++)
-//         for (j = 0; j < c; j++)
-//             printf("%d ", *(v.arr + i * c + j));
-
-//     // result = will_be_alive_torus(&v, 19, 19);
-//     // printf("\nWill Be Alive? %d \n", result);
-
-//     printf("Evolving\n");
-
-//     int (*fun_ptr_arr[])(struct universe * u, int column, int row) = {will_be_alive, will_be_alive_torus};
-
-//     evolve(&v, fun_ptr_arr[0]);
-
-// }
