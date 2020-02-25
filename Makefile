@@ -4,15 +4,15 @@
   # compiler flags:
   #  -g    adds debugging information to the executable file
   #  -Wall turns on most, but not all, compiler warnings
-  CFLAGS  = -Wall -Wextra -pedantic -std=c11
-
   # the build target executable:
-  TARGET = gameoflife
 
-  all: $(TARGET)
-
-  $(TARGET):	$(TARGET).c
-	gcc $(CFLAGS) gameoflife.c gol.c -o gameoflife     
+  all: gol.o libgol.so gameoflife
+  gol.o: gol.c
+	gcc -g -fPIC -Wall -Wextra -pedantic -c -std=c11 gol.c
+  libgol.so:  gol.o
+	gcc gol.o -shared -o libgol.so
+  gameoflife: gameoflife.c
+	gcc -g -fPIC -Wall -Wextra -pedantic -std=c11 -L . gameoflife.c -lgol -o gameoflife
 
   clean:
-	rm gameoflife
+	rm gol.o libgol.so gameoflife

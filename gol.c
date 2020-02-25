@@ -7,17 +7,11 @@
 
 #define MAXCHAR 1000
 
-// struct universe
-// {
-//     /*Put some appropriate things here*/
-//     int width;
-//     int height;
-//     int *arr;
-//     int evolutions;
-// };
-
 void read_in_file(FILE *infile, struct universe *u)
 {
+
+    rewind(infile);
+
     u->evolutions = 1;
     int width;
     int height;
@@ -26,6 +20,7 @@ void read_in_file(FILE *infile, struct universe *u)
     int ch;
     int len = 0;
     int size;
+    int first_line = 0;
 
     size = 10;
     height = 1;
@@ -39,19 +34,44 @@ void read_in_file(FILE *infile, struct universe *u)
 
         if (ch == '\n')
         {
+            if (width > 512)
+            {
+                fprintf(stderr, "\nNumber of Columns exceeds 512 (Need to reduce the input universe to a smaller number of columns)");
+                exit(1);
+            }
+            if (first_line)
+            {
+                if (width != u->width)
+                {
+                    fprintf(stderr, "\nMalformed Input (not rectanglular)");
+                    exit(1);
+                }
+            }
+            first_line = 1;
             u->width = width;
+
             width = -1;
             height++;
         }
-
-        if (ch == '.')
+        else
         {
-            str[len++] = 0;
-        }
-        if (ch == '*')
-        {
-            u->totalAlive++;
-            str[len++] = 1;
+            if (ch == '.')
+            {
+                str[len++] = 0;
+            }
+            else
+            {
+                if (ch == '*')
+                {
+                    u->totalAlive++;
+                    str[len++] = 1;
+                }
+                else
+                {
+                    fprintf(stderr, "\nInput contains character  ----->  %c\nOnly * or . allowed", ch);
+                    exit(1);
+                }
+            }
         }
 
         if (len == size)
@@ -63,81 +83,16 @@ void read_in_file(FILE *infile, struct universe *u)
     u->height = height;
 
     u->arr = realloc(str, sizeof(int) * len);
-
-    // u->evolutions = 0;
-    // char str[MAXCHAR];
-    // int width;
-    // int height;
-    // int i;
-    // int j;
-
-    // if (infile == NULL)
-    // {
-    //     printf("Could not open file");
-    // }
-    // height = 0;
-
-    // while (fgets(str, MAXCHAR, infile) != NULL)
-    // {
-    //     printf("Could not open file %s", str);
-
-    //     width = strlen(str);
-    //     height++;
-    // }
-
-    // u->height = height;
-    // u->width = width;
-
-    // int r = width, c = height;
-    // u->arr = (int *)malloc(r * c * sizeof(int));
-
-    // int booli;
-
-    // printf("Could not op file");
-
-    // rewind(infile);
-    // printf("Could not op file");
-
-    // j = 0;
-    // while (fgets(str, MAXCHAR, infile) != NULL)
-    // {
-    //     printf("yo %s", str);
-
-    //     for (i = 0; str[i] != 0; i++)
-    //     {
-    //         if (i == 0)
-    //         {
-    //         }
-    //         if (str[i] == '.')
-    //         {
-    //             booli = 0;
-    //         }
-    //         else
-    //         {
-    //             u->totalAlive++;
-
-    //             booli = 1;
-    //         }
-    //         // printf("\n%d %d", j, i);
-    //         *(u->arr + i + j * r) = booli;
-    //     }
-    //     j++;
-    // }
-    // // printf("\n");
-
-    // // printf("width: %d height: %d", u->width, u->height);
-
-    // fclose(infile);
 }
 
 void write_out_file(FILE *outfile, struct universe *u)
 {
     int i, j;
+    printf("\n");
 
     for (i = 0; i < u->height; i++)
         for (j = 0; j < u->width; j++)
         {
-            // printf("\n%d %d",j,i);
 
             if (i > 0 && j == 0)
             {

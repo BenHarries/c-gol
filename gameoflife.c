@@ -2,6 +2,7 @@
 // It ignores all command line options
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "gol.h"
 #ifdef _WIN32
 #include <Windows.h>
@@ -31,10 +32,11 @@ int isNumber(char number[])
 
 int main(int argc, char *argv[])
 {
-
     struct universe v;
 
-    // printf("%d", argc);-
+    // Uncomment to store mulitple universes
+    // struct universe r;
+
     int input_specified, output_specified, print_stats;
 
     int i;
@@ -50,21 +52,36 @@ int main(int argc, char *argv[])
 
     FILE *outfp;
     FILE *infp;
+    char prev_arguments[5] = "";
+    int numarguments = 0;
 
     for (i = 1; i < argc; i++)
     {
         if (argv[i][0] == '-')
         {
+            printf("%s", prev_arguments);
+            if (strchr(prev_arguments, argv[i][1]) != NULL)
+            {
+                fprintf(stderr, "Already specified this argument ------> -%c  (no conflicting arguments allowed)", argv[i][1]);
+                exit(1);
+            }
+            else
+            {
+                prev_arguments[numarguments] = argv[i][1];
+                numarguments++;
+            }
             switch (argv[i][1])
             {
             case 'i':
+
                 inputfile = argv[i + 1];
                 input_specified = 1;
                 infp = fopen(argv[i + 1], "r");
+                // infp2 = fopen(argv[i + 1], "r");
                 if ((i + 1) >= argc || inputfile[0] == '-')
                 {
                     fprintf(stderr, "Didnt Specify an Input File after '-i' ");
-                    exit(0);
+                    exit(1);
                 }
                 break;
             case 'o':
@@ -74,7 +91,7 @@ int main(int argc, char *argv[])
                 if ((i + 1) >= argc || outputfile[0] == '-')
                 {
                     fprintf(stderr, "Didnt Specify an Output File after '-o' ");
-                    exit(0);
+                    exit(1);
                 }
                 outfp = fopen(argv[i + 1], "w");
                 break;
@@ -83,7 +100,7 @@ int main(int argc, char *argv[])
                 if (isNumber(argv[i + 1]) == 0)
                 {
                     fprintf(stderr, "The number of evolutions has to be an integer greater or equal to 0");
-                    exit(0);
+                    exit(1);
                 }
                 numberofgenerations = atoi(argv[i + 1]); // stderr check that it is a positive interger
 
@@ -97,38 +114,45 @@ int main(int argc, char *argv[])
             default:
                 // stderr
                 fprintf(stderr, "Unknown option %s\n", argv[i]);
-                exit(0);
+                exit(1);
             }
         }
     }
 
     if (input_specified == 0)
     {
+
         read_in_file(stdin, &v);
+        // read_in_file(stdin, &r);
     }
     else
     {
         read_in_file(infp, &v);
+        // read_in_file(infp, &r);
     }
 
     while (numberofgenerations > 0)
     {
         evolve(&v, rule);
+        // evolve(&r, rule);
         numberofgenerations--;
     }
 
     if (output_specified == 0)
     {
         write_out_file(stdout, &v);
+        // write_out_file(stdout, &r);
     }
     else
     {
         write_out_file(outfp, &v);
+        // write_out_file(outfp, &r);
     }
 
     if (print_stats == 1)
     {
         print_statistics(&v);
+        // print_statistics(&r);
     }
 
     return 0;
