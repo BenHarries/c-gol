@@ -63,7 +63,10 @@ void read_in_file(FILE *infile, struct universe *u)
             {
                 if (ch == '*')
                 {
+                    printf("total %d", u->totalAlive);
                     u->totalAlive += 1;
+                    printf("total %d", u->totalAlive);
+
                     str[len++] = 1;
                 }
                 else
@@ -153,7 +156,11 @@ int will_be_alive(struct universe *u, int column, int row)
 
     if (is_alive(u, column, row))
     {
+        printf("total %d", u->totalAlive);
+
         u->totalAlive += 1;
+        printf("total %d", u->totalAlive);
+
         if (counter == 2 || counter == 3)
         {
             return 1;
@@ -237,7 +244,10 @@ int will_be_alive_torus(struct universe *u, int column, int row)
 
     if (is_alive(u, column, row))
     {
+        printf("total %d", u->totalAlive);
+
         u->totalAlive += 1;
+        printf("total %d", u->totalAlive);
 
         if (counter == 2 || counter == 3)
         {
