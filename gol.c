@@ -298,7 +298,7 @@ void print_statistics(struct universe *u)
 {
     // printf("Hello");
     int i, j;
-    float currentStat, currentAlive, historicalStat;
+    float currentStat, currentAlive, historicalStat, totalAlivefloat;
     currentAlive = 0;
     for (i = 0; i < u->height; i++)
     {
@@ -317,7 +317,9 @@ void print_statistics(struct universe *u)
 
     printf("\n%.3f%% of cells currently alive", nearest);
 
-    historicalStat = (u->totalAlive * 100) / (u->height * u->width * u->evolutions);
+    totalAlivefloat = (float)u->totalAlive;
+
+    historicalStat = (totalAlivefloat * 100) / (u->height * u->width * u->evolutions);
 
     float nearestH = roundf(historicalStat * 1000) / 1000;
 

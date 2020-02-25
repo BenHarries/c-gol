@@ -12,7 +12,7 @@
   libgol.so:  gol.o
 	gcc gol.o -shared -o libgol.so
   gameoflife: gameoflife.c
-	gcc -g -fPIC -Wall -Wextra -pedantic -std=c11 -L . gameoflife.c -lgol -o gameoflife
+	gcc -g -lm -fPIC -Wall -Wextra -pedantic -std=c11 -L . gameoflife.c -lgol -o gameoflife
 
   clean:
 	rm gol.o libgol.so gameoflife

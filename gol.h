@@ -4,7 +4,7 @@ struct universe
     int width;
     int height;
     int *arr;
-    float totalAlive;
+    int totalAlive;
     int evolutions;
 };
 
