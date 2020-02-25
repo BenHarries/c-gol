@@ -59,7 +59,6 @@ int main(int argc, char *argv[])
     {
         if (argv[i][0] == '-')
         {
-            printf("%s", prev_arguments);
             if (strchr(prev_arguments, argv[i][1]) != NULL)
             {
                 fprintf(stderr, "Already specified this argument ------> -%c  (no conflicting arguments allowed)", argv[i][1]);

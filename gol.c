@@ -13,6 +13,7 @@ void read_in_file(FILE *infile, struct universe *u)
     rewind(infile);
 
     u->evolutions = 1;
+    u->totalAlive = 0;
     int width;
     int height;
 
@@ -63,9 +64,8 @@ void read_in_file(FILE *infile, struct universe *u)
             {
                 if (ch == '*')
                 {
-                    printf("total %d", u->totalAlive);
+
                     u->totalAlive += 1;
-                    printf("total %d", u->totalAlive);
 
                     str[len++] = 1;
                 }
@@ -156,10 +156,8 @@ int will_be_alive(struct universe *u, int column, int row)
 
     if (is_alive(u, column, row))
     {
-        printf("total %d", u->totalAlive);
 
         u->totalAlive += 1;
-        printf("total %d", u->totalAlive);
 
         if (counter == 2 || counter == 3)
         {
@@ -244,10 +242,8 @@ int will_be_alive_torus(struct universe *u, int column, int row)
 
     if (is_alive(u, column, row))
     {
-        printf("total %d", u->totalAlive);
 
         u->totalAlive += 1;
-        printf("total %d", u->totalAlive);
 
         if (counter == 2 || counter == 3)
         {
@@ -326,11 +322,8 @@ void print_statistics(struct universe *u)
     float nearest = roundf(currentStat * 1000) / 1000;
 
     printf("\n%.3f%% of cells currently alive", nearest);
-    printf("\n%d yo", u->totalAlive);
 
     totalAlivefloat = (float)u->totalAlive;
-
-    printf("\n%d mo", u->totalAlive);
 
     historicalStat = (totalAlivefloat * 100) / (u->height * u->width * u->evolutions);
 
